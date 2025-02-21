@@ -1,0 +1,16 @@
+{
+    "job_name": "train-nnunet",
+    "wall_time": "23:00:00",
+    "nodes": 1,
+    "alvis":{
+        "cpus_per_task": 4,
+        "gpus_per_node": "T4:1",
+        "tasks_per_node": 1,
+        "env_variables": {
+    }
+    },
+    "project_dir": "/mnt/proj-dir",
+    "singularity_image": "nnUNet-MONAI.sif",
+    
+    "command": "python $ROOT_DIR/nnUNet_train.py --nnunet-root-dir /mnt/proj-dir/Data/nnUNet --fold 0"
+}
