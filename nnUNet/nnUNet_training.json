@@ -1,5 +1,5 @@
 {
-    "job_name": "train-nnunet",
+    "job_name": "nnunet-training",
     "wall_time": "23:00:00",
     "nodes": 1,
     "alvis":{
@@ -7,6 +7,7 @@
         "gpus_per_node": "T4:1",
         "tasks_per_node": 1,
         "env_variables": {
+            "ROOT_DIR": "$HOME/nnUNet"
     }
     },
     "project_dir": "/mnt/proj-dir",

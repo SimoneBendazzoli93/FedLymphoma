@@ -37,7 +37,7 @@ edit_ssh_config.sh
 and adding the following lines:
 ```bash
 [<server_name>]
-EXPERIMENT_NAME=train-nnunet
+EXPERIMENT_NAME=nnUNet_training
 REMOTE_PATH=~/nnUNet
 LOCAL_PATH=</path/to/repo>/nnUNet
 ```

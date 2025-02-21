@@ -47,4 +47,7 @@ def main():
     data_src_cfg = os.path.join(nnunet_root_dir, "data_src_cfg.yaml")
 
     train(data_src_cfg, nnunet_root_dir, fold=fold)
-    
+
+
+if __name__ == "__main__":
+    main()
