@@ -7,7 +7,11 @@
         "gpus_per_node": "T4:1",
         "tasks_per_node": 1,
         "env_variables": {
-            "ROOT_DIR": "$HOME/nnUNet"
+            "ROOT_DIR": "$HOME/nnUNet",
+            "PATH": "$HOME/.local/bin:$PATH",
+            "nnUNet_def_n_proc": "2",
+            "nnUNet_n_proc_DA": "2",
+            "nnUNet_compile": "False"
     }
     },
     "project_dir": "/mnt/proj-dir",

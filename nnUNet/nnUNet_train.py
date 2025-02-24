@@ -6,7 +6,7 @@ import argparse
 
 
 
-def train(data_src_cfg, nnunet_root_dir, fold=0):
+def train(data_src_cfg, nnunet_root_dir, fold=0,kwargs=None):
     """
     Trains a neural network model using the nnUNet framework.
     
@@ -18,6 +18,8 @@ def train(data_src_cfg, nnunet_root_dir, fold=0):
         Root directory for nnUNet.
     fold : int, optional
         Fold number for cross-validation (default is 0).
+    kwargs : dict, optional
+        Additional keyword arguments.
     
     Returns
     -------
@@ -28,7 +30,7 @@ def train(data_src_cfg, nnunet_root_dir, fold=0):
         input_config=data_src_cfg, trainer_class_name="nnUNetTrainer", work_dir=nnunet_root_dir
     )
     
-    runner.train_single_model(config="3d_fullres", fold=fold)
+    runner.train_single_model(config="3d_fullres", fold=fold,**kwargs)
     
 def get_arg_parser():
     
@@ -41,12 +43,22 @@ def get_arg_parser():
     
 def main():
     parser = get_arg_parser()
-    args = parser.parse_args()
+    args, unknown_arguments = parser.parse_known_args()
+
+    unknown_args = {}
+    if unknown_arguments:
+        for arg in unknown_arguments:
+            if arg.startswith(("-", "--")):
+                key = arg[2:]
+                unknown_args[key] = ""
+            else:
+                unknown_args[key] = arg
+
     nnunet_root_dir = args.nnunet_root_dir
     fold = args.fold
     data_src_cfg = os.path.join(nnunet_root_dir, "data_src_cfg.yaml")
 
-    train(data_src_cfg, nnunet_root_dir, fold=fold)
+    train(data_src_cfg, nnunet_root_dir, fold=fold,kwargs=unknown_args)
 
 
 if __name__ == "__main__":
