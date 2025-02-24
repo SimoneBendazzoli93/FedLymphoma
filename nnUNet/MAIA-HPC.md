@@ -6,7 +6,7 @@
 You first need to install MAIA-HPC. You can follow the instructions in the [MAIA-HPC repository](https://github.com/kthcloud/MAIA/tree/master/MAIA-HPC).
 After the installation, you can configure your HPC server by running the following command:
 ```bash
-configure_MAIA_HPC.sh
+configure_MAIA-HPC.sh
 ```
 After configuring the HPC server, you can also import the nnUNet training experiment configuration by running the following command:
 ```bash
