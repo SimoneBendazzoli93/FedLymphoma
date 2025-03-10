@@ -1,0 +1,16 @@
+{
+    "job_name": "start-alvis-client",
+    "wall_time": "23:00:00",
+    "nodes": 1,
+    "alvis":{
+        "cpus_per_task": 4,
+        "gpus_per_node": "T4:1",
+        "tasks_per_node": 1,
+        "env_variables": {
+    }
+    },
+    "project_dir": "/mnt/proj-dir",
+    "singularity_image": "FLymphoma-NVFlare_Cuda.sif",
+    
+    "command": "python -u -m nvflare.private.fed.app.client.client_train -m /mnt/proj-dir/NVFlare/alvis -s fed_client.json --set secure_train=true uid=Alvis org=Alvis config_folder=config"
+}
