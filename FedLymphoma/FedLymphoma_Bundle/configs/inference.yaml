@@ -1,0 +1,101 @@
+
+imports: 
+  - $import json
+  - $from pathlib import Path
+  - $import os
+  - $from ignite.contrib.handlers.tqdm_logger import ProgressBar
+  - $import shutil
+  - $import src
+  - $import src.dataset
+
+
+output_dir: "."
+bundle_root: "."
+data_list_file : "."
+data_dir: "."
+
+fold_id: 0
+model_name: "model.pt"
+prediction_suffix: "prediction"
+
+
+modality_conf:
+  image:
+    suffix: ".nii.gz"
+
+test_data_list: "$src.dataset.get_subfolder_dataset(@data_dir,@modality_conf)"
+#test_data_list: "$monai.data.load_decathlon_datalist(@data_list_file, is_segmentation=True, data_list_key='testing', base_dir=@data_dir)"
+image_modality_keys: "$list(@modality_conf.keys())"
+image_key: "image"
+image_suffix: "@image_key"
+
+preprocessing:
+  _target_: Compose
+  transforms:
+  - _target_: LoadImaged
+    keys: "image"
+    ensure_channel_first: True
+    image_only: False
+
+test_dataset:
+  _target_: Dataset
+  data: "$@test_data_list"
+  transform: "@preprocessing"
+
+test_loader:
+  _target_: DataLoader
+  dataset: "@test_dataset"
+  batch_size: 1
+
+
+device: "$torch.device('cuda')"
+
+nnunet_config:
+  model_folder: "$@bundle_root + '/models/fold_'+str(@fold_id)"
+  model_name: "@model_name"
+
+network_def: "$monai.apps.nnunet.nnunet_bundle.get_nnunet_monai_predictor(**@nnunet_config)"
+
+network_def_predictor: "$@network_def.network_weights"
+postprocessing:
+  _target_: "Compose"
+  transforms:
+    #- _target_: Transposed
+    #  keys: "pred"
+    #  indices:
+    #  - 0
+    #  - 3
+    #  - 2
+    #  - 1
+    - _target_: SaveImaged
+      keys: "pred"
+      resample: False
+      output_postfix: "@prediction_suffix"
+      output_dir: "@output_dir"
+      meta_keys: "image_meta_dict"
+
+
+testing:
+  dataloader: "$@test_loader"
+  pbar:
+    _target_: "ignite.contrib.handlers.tqdm_logger.ProgressBar"
+  test_inferer: "$@inferer"
+
+inferer: 
+  _target_: "SimpleInferer"
+
+validator:
+  _target_: "SupervisedEvaluator"
+  postprocessing: "$@postprocessing"
+  device: "$@device"
+  inferer: "$@testing#test_inferer"
+  val_data_loader: "$@testing#dataloader"
+  network: "@network_def"
+  val_handlers:
+  - _target_: "CheckpointLoader"
+    load_path: "$@bundle_root+'/models/fold_'+str(@fold_id)+'/'+@model_name"
+    load_dict:
+      network_weights: '$@network_def.network_weights'
+run:
+  - "$@testing#pbar.attach(@validator)"
+  - "$@validator.run()"
